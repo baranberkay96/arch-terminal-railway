@@ -35,7 +35,7 @@ A bare `archlinux` container on Railway has no way in except Railway's own CLI. 
 |---|---|---|
 | Terminal | Dockerfile based on `archlinux:base-20261108.0.623074` | nginx basic-auth proxy on port 8080 (public HTTPS domain, `/healthz`), ttyd on loopback, tmux sessions, user `arch` with sudo, volume at `/home` |
 
-**Plan:** works on every plan, including Free (0.5 GB RAM per service). MEASURED_RAM_LINE
+**Plan:** works on every plan, including Free (0.5 GB RAM per service). Measured on Railway with a 0.5 GB memory limit: about 0.035 GB of RAM idle, and about 0.18 GB (page cache included) right after an `npm install -g`; an AUR build of `yay-bin` with `makepkg` also ran fine. The image is about 0.45 GB compressed (single layer). Large builds can need more than 0.5 GB; on Free the kernel then stops that process, not the terminal.
 
 **First login**
 
