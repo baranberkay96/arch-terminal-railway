@@ -6,7 +6,13 @@
 # The base image is pinned by dated tag and digest; every build then runs a
 # full `pacman -Syu`, so the system is as current as the Arch mirrors on the
 # day it is built.
-FROM archlinux:base-20261108.0.623074@sha256:d4594bb2300cba11f41c2f27923eb56f63d9988909c402f9c95517d1e362c899
+#
+# The image is built in one stage and copied into an empty final stage, so it
+# ships as a single layer. Railway's runtime showed directories and files that
+# `pacman -Syu` had removed from the base layer (old /var/lib/pacman/local
+# entries, so pacman reported "duplicated database entry"); a single layer
+# carries no deletions over a lower layer.
+FROM archlinux:base-20261108.0.623074@sha256:d4594bb2300cba11f41c2f27923eb56f63d9988909c402f9c95517d1e362c899 AS build
 
 # tini static release binary (Arch has no tini package). The checksum comes
 # from https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-amd64.sha256sum.
@@ -35,6 +41,7 @@ RUN pacman -Syu --noconfirm --needed \
       openbsd-netcat openssh openssl procps-ng python python-pip python-pipx \
       ripgrep rsync sqlite tmux tree ttyd tzdata unzip vim wget which xz zip \
  && rm -rf /var/cache/pacman/pkg/* \
+ && test -z "$(pacman -Qq 2>&1 > /dev/null)" \
  && ttyd --version \
  && node --version \
  && npm --version
@@ -109,6 +116,13 @@ COPY tmux.conf /etc/tmux.conf
 RUN chmod 0755 /usr/local/bin/arch-terminal-entrypoint /usr/local/bin/terminal-session \
  && chmod 0644 /etc/arch-terminal/bashrc /etc/arch-terminal/motd \
       /etc/arch-terminal/nginx.conf.template /etc/tmux.conf
+
+FROM scratch
+COPY --from=build / /
+
+ENV LANG=C.UTF-8 \
+    TZ=UTC \
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
 
 EXPOSE 8080
 
