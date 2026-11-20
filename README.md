@@ -1,5 +1,7 @@
 # Deploy and Host Arch Linux Web Terminal with Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/arch-linux-web-terminal-browser-shell?referralCode=20H68q)
+
 An Arch Linux shell that opens in any browser. You work as the user `arch` with sudo, inside tmux, so sessions and long-running jobs survive closed tabs. A generated password protects the login, and your home directory sits on a persistent volume. base-devel, Git, Python, Node.js 24 and everyday CLI tools come preinstalled, so `makepkg` and AUR builds work out of the box.
 
 ## About Hosting Arch Linux Web Terminal
